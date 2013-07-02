@@ -31,8 +31,20 @@ public class Monument {
         this.town = town;
     }
     
+    public Monument(String id, String name, String number, String gmina, String town, String street, int partOf) {
+        this.id = Integer.parseInt(id);
+        this.name = name;
+        this.number = number;
+        this.gmina = gmina;
+        this.town = town;
+        this.street = street;
+        this.partOf = partOf;
+    }
+    
     public boolean isPart(Monument m) {
         //if(name.contains("zespół")) return false;
+        if(m.partOf == 1) return false;
+        
         if(m.number.equals(number)) {
             System.out.println("Equals: number");
             return true;
@@ -62,4 +74,12 @@ public class Monument {
             case "mur.-met.":   this.material = Material.MUR_MET; break;
         }
     };
+    
+    public String show(){
+        String text = "";
+        text += "\t\t " + name + "\n";
+        for(Monument m : parts) text += "\t" + m.show();
+        
+        return text;
+    }
 }
