@@ -12,8 +12,9 @@ public class Gmina {
     public String powiat;
     public ArrayList<Monument> monuments = new ArrayList<>();
     
-    public Gmina(String name) {
+    public Gmina(String name, int powiat) {
         this.name = name;
+        this.powiat = Main.powiats.get(powiat).name;
     }
     
     public void add(Monument m) {
@@ -29,7 +30,7 @@ public class Gmina {
     }
     
     public String show() {
-        String text = "{{zabytki/góra\n";
+        String text = "\n== " + name + "==\n{{zabytki/góra\n";
             text += "| województwo = " + Main.VOIV_CODE + "\n";
             text += "| powiat      = " + powiat + "\n";
             text += "| gmina       = " + name + "\n";
@@ -37,7 +38,7 @@ public class Gmina {
 
         for(Monument m : monuments) text += m.show(-1);
         
-        text += "|}";
+        text += "|}\n";
         
         return text;
     }

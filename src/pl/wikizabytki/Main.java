@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 import java.io.File; 
 import java.io.IOException;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 import jxl.*; 
 import javax.swing.UIManager;
 import jxl.read.biff.BiffException;
@@ -14,7 +15,7 @@ import pl.wikizabytki.classes.Powiat;
 
 public class Main extends javax.swing.JFrame {
     Log log;
-    ArrayList<Powiat> powiats = new ArrayList<>();
+    public static ArrayList<Powiat> powiats = new ArrayList<>();
     
     public static String VOIV;
     public static String VOIV_CODE;
@@ -173,7 +174,7 @@ public class Main extends javax.swing.JFrame {
         int currentPowiat = 0;
         int currentGmina = 0;
         
-        VOIV = sheet.getCell(2,1).getContents();
+        VOIV = sheet.getCell(1,1).getContents();
         switch(VOIV){
             case "kujawsko-pomorskie": VOIV_CODE = "PL-KP"; break;
             case "lubelskie": VOIV_CODE = "PL-LU"; break;
@@ -208,6 +209,20 @@ public class Main extends javax.swing.JFrame {
             String date = sheet.getCell(11,i).getContents();
             String number = sheet.getCell(12,i).getContents();
             
+            //fixes
+            if(gmina.endsWith(" - gm."))
+                gmina = gmina.substring(0, gmina.indexOf(" - gm."));
+            
+            if(gmina.startsWith("M. "))
+                gmina = gmina.substring(3);
+            else
+                gmina = "gmina " + gmina;
+            
+            if(powiat.startsWith("m. "))
+                powiat = powiat.substring(3);
+            else
+                powiat = "powiat " + powiat;
+            
             //powiat
             if(powiats.isEmpty())
                 powiats.add(new Powiat(powiat));
@@ -229,7 +244,7 @@ public class Main extends javax.swing.JFrame {
             
             //gmina
             if(powiats.get(currentPowiat).gminas.isEmpty()) 
-                powiats.get(currentPowiat).gminas.add(new Gmina(gmina));
+                powiats.get(currentPowiat).gminas.add(new Gmina(gmina, currentPowiat));
             
             if(!powiats.get(currentPowiat).gminas.get(currentGmina).name.equals(gmina)) {
                 boolean flag = false;
@@ -242,7 +257,7 @@ public class Main extends javax.swing.JFrame {
 
                 if(!flag) {
                     //System.out.println("Dodaję gminę '"+gmina+"'");
-                    powiats.get(currentPowiat).gminas.add(new Gmina(gmina));
+                    powiats.get(currentPowiat).gminas.add(new Gmina(gmina, currentPowiat));
                     currentGmina = powiats.get(currentPowiat).gminas.size()-1;
                 }
             } //else System.out.println("Aktualna gmina pasuje!");
