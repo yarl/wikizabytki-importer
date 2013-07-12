@@ -41,9 +41,14 @@ public class Monument {
         this.partOf = partOf;
     }
     
+    /**
+     * Checks if monument in parameter is part of this monument complex
+     * @param m
+     * @return 
+     */
     public boolean isPart(Monument m) {
         //if(name.contains("zespół")) return false;
-        if(m.partOf == 1) return false;
+        //if(m.partOf == 1) return false;
         
         if(m.number.equals(number)) {
             System.out.println("Equals: number");
@@ -55,7 +60,7 @@ public class Monument {
         }
         return false;
     }
-    
+       
     public void addPart(Monument m) {
         parts.add(m);
     }
@@ -75,11 +80,36 @@ public class Monument {
         }
     };
     
-    public String show(){
-        String text = "";
-        text += "\t\t " + name + "\n";
-        for(Monument m : parts) text += "\t" + m.show();
-        
+//    public String _show(){
+//        String text = "";
+//        text += "\t\t " + name + "\n";
+//        for(Monument m : parts) text += "\t" + m.show();
+//        return text;
+//    }
+    
+    public String show(int n){
+        String text = "{{zabytki/wpis\n";
+            text += "| numer       = " + number + " | id = " + id + "\n";
+            text += "| zespół zabytków = "; 
+                if(parts.isEmpty()) text += "nie\n";
+                else if(!parts.isEmpty()) text += "tak\n";
+                else if(n>0) text += n + "\n";
+                else text += "??";
+            text += "| nazwa       = " + name + "\n";
+            text += "| miejscowość = " + town + "\n";
+            text += "| adres       = " + street + "\n";
+            text += "| długość     =  | szerokość  = \n";
+            text += "| zdjęcie     = \n";
+            text += "| commons     = \n";
+            text += "}}\n";
+            
+        if(!parts.isEmpty()){
+            text += "{{zabytki/zespół zabytków/góra}}\n";
+            for(Monument m : parts) text += m.show(id);
+            text += "{{zabytki/zespół zabytków/dół}}\n";
+        }   
         return text;
     }
+    
+    
 }

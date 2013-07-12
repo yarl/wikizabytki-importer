@@ -16,6 +16,9 @@ public class Main extends javax.swing.JFrame {
     Log log;
     ArrayList<Powiat> powiats = new ArrayList<>();
     
+    public static String VOIV;
+    public static String VOIV_CODE;
+    
     public Main() {
         initComponents();
         setLocationRelativeTo(null);
@@ -26,20 +29,21 @@ public class Main extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        bStart = new javax.swing.JButton();
-        tFile = new javax.swing.JTextField();
-        lFile = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         loger = new javax.swing.JTextPane();
+        jPanel1 = new javax.swing.JPanel();
+        tFile = new javax.swing.JTextField();
+        bStart = new javax.swing.JButton();
+        jPanel2 = new javax.swing.JPanel();
+        tLogin = new javax.swing.JTextField();
+        tPassword = new javax.swing.JPasswordField();
+        bLogin = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        bStart.setText("Start");
-        bStart.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bStartActionPerformed(evt);
-            }
-        });
+        jScrollPane2.setViewportView(loger);
+
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Path to XLS file"));
 
         tFile.setText("C:\\Users\\Pawel\\Dropbox\\Wiki\\Wiki Lubi Zabytki\\Listy\\kujawsko-pomorskie.xls");
         tFile.addActionListener(new java.awt.event.ActionListener() {
@@ -48,9 +52,67 @@ public class Main extends javax.swing.JFrame {
             }
         });
 
-        lFile.setText("XLS path");
+        bStart.setText("Start");
+        bStart.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bStartActionPerformed(evt);
+            }
+        });
 
-        jScrollPane2.setViewportView(loger);
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(tFile, javax.swing.GroupLayout.DEFAULT_SIZE, 475, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(bStart, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(tFile, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(bStart)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Login"));
+
+        tLogin.setText("YarluBot");
+
+        bLogin.setText("Log in");
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(tLogin)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(tPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(bLogin, javax.swing.GroupLayout.DEFAULT_SIZE, 90, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(tLogin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(tPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(bLogin))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -61,24 +123,20 @@ public class Main extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane2)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(lFile, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(tFile, javax.swing.GroupLayout.DEFAULT_SIZE, 442, Short.MAX_VALUE))
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(bStart, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lFile)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(bStart, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(tFile, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 353, Short.MAX_VALUE)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -105,11 +163,37 @@ public class Main extends javax.swing.JFrame {
     }//GEN-LAST:event_tFileActionPerformed
 
     private void start(String path) throws IOException, BiffException {
-        Workbook workbook = Workbook.getWorkbook(new File(tFile.getText()));
+        //@source: http://stackoverflow.com/a/7451775
+        WorkbookSettings workbookSettings = new WorkbookSettings();
+        workbookSettings.setEncoding("Cp1250");
+    
+        Workbook workbook = Workbook.getWorkbook(new File(tFile.getText()), workbookSettings);
         Sheet sheet = workbook.getSheet(0);
  
         int currentPowiat = 0;
         int currentGmina = 0;
+        
+        VOIV = sheet.getCell(2,1).getContents();
+        switch(VOIV){
+            case "kujawsko-pomorskie": VOIV_CODE = "PL-KP"; break;
+            case "lubelskie": VOIV_CODE = "PL-LU"; break;
+            case "lubuskie": VOIV_CODE = "PL-LB"; break;
+            case "łódzkie": VOIV_CODE = "PL-LD"; break;
+            case "małopolskie": VOIV_CODE = "PL-MA"; break;
+            case "mazowieckie": VOIV_CODE = "PL-MZ"; break;
+            case "opolskie": VOIV_CODE = "PL-OP"; break;
+            case "podkarpackie": VOIV_CODE = "PL-PK"; break;
+            case "podlaskie": VOIV_CODE = "PL-PD"; break;
+            case "pomorskie": VOIV_CODE = "PL-PM"; break;
+            case "śląskie": VOIV_CODE = "PL-SL"; break;
+            case "świętokrzyskie": VOIV_CODE = "PL-SK"; break;
+            case "warmińsko-mazurskie": VOIV_CODE = "PL-WN"; break;
+            case "wielkopolskie": VOIV_CODE = "PL-WP"; break;
+            case "zachodniopomorskie": VOIV_CODE = "PL-ZP"; break;
+            default: VOIV_CODE = "??";
+        }
+        
+        //if default stop
         
         for(int i=1; i<100 /*sheet.getColumn(0).length*/; ++i) {
             String id = sheet.getCell(0,i).getContents();
@@ -201,10 +285,14 @@ public class Main extends javax.swing.JFrame {
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton bLogin;
     private javax.swing.JButton bStart;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JLabel lFile;
     private javax.swing.JTextPane loger;
     private javax.swing.JTextField tFile;
+    private javax.swing.JTextField tLogin;
+    private javax.swing.JPasswordField tPassword;
     // End of variables declaration//GEN-END:variables
 }

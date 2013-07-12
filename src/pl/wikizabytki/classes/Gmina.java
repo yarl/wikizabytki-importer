@@ -1,6 +1,7 @@
 package pl.wikizabytki.classes;
 
 import java.util.ArrayList;
+import pl.wikizabytki.Main;
 
 /**
  *
@@ -8,6 +9,7 @@ import java.util.ArrayList;
  */
 public class Gmina {
     public String name;
+    public String powiat;
     public ArrayList<Monument> monuments = new ArrayList<>();
     
     public Gmina(String name) {
@@ -22,9 +24,21 @@ public class Gmina {
         } else monuments.add(m);
     }
     
+    public String URL() {
+        return "Wikipedia:Wiki Lubi Zabytki/" + Main.VOIV + "/" + powiat + "/" + name;
+    }
+    
     public String show() {
-        String text = "\t gmina " + name + "\n";
-        for(Monument m : monuments) text += m.show();
+        String text = "{{zabytki/góra\n";
+            text += "| województwo = " + Main.VOIV_CODE + "\n";
+            text += "| powiat      = " + powiat + "\n";
+            text += "| gmina       = " + name + "\n";
+            text += "}}\n";
+
+        for(Monument m : monuments) text += m.show(-1);
+        
+        text += "|}";
+        
         return text;
     }
 }
