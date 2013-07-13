@@ -51,11 +51,11 @@ public class Monument {
         //if(m.partOf == 1) return false;
         
         if(m.number.equals(number)) {
-            System.out.println("Equals: number");
+            //System.out.println("Equals: number");
             return true;
         }
         if(m.street.equals(street) && m.number.equals(number)) {
-            System.out.println("Equals: street 'n' number");
+            //System.out.println("Equals: street 'n' number");
             return true;
         }
         return false;
@@ -80,14 +80,7 @@ public class Monument {
         }
     };
     
-//    public String _show(){
-//        String text = "";
-//        text += "\t\t " + name + "\n";
-//        for(Monument m : parts) text += "\t" + m.show();
-//        return text;
-//    }
-    
-    public String show(int n){
+    public String getWikiCode(int n){
         String text = "{{zabytki/wpis\n";
             text += "| numer       = " + number + " | id = " + id + "\n";
             text += "| zespół zabytków = "; 
@@ -105,11 +98,9 @@ public class Monument {
             
         if(!parts.isEmpty()){
             text += "{{zabytki/zespół zabytków/góra}}\n";
-            for(Monument m : parts) text += m.show(id);
+            for(Monument m : parts) text += m.getWikiCode(id);
             text += "{{zabytki/zespół zabytków/dół}}\n";
         }   
         return text;
     }
-    
-    
 }

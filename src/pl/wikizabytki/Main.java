@@ -5,20 +5,27 @@ import java.util.logging.Logger;
 import java.io.File; 
 import java.io.IOException;
 import java.util.ArrayList;
-import javax.swing.JOptionPane;
+import javax.security.auth.login.FailedLoginException;
 import jxl.*; 
 import javax.swing.UIManager;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import jxl.read.biff.BiffException;
+import org.wikipedia.Wiki;
 import pl.wikizabytki.classes.Gmina;
 import pl.wikizabytki.classes.Monument;
 import pl.wikizabytki.classes.Powiat;
 
 public class Main extends javax.swing.JFrame {
-    Log log;
-    public static ArrayList<Powiat> powiats = new ArrayList<>();
+    public static Log log;
     
+    public static ArrayList<Powiat> powiats = new ArrayList<>();
     public static String VOIV;
     public static String VOIV_CODE;
+    public static Wiki wiki = new Wiki("pl.wikipedia.org");
+    
+    public static DefaultMutableTreeNode top = new DefaultMutableTreeNode("(woj)");
+    public static DefaultTreeModel model = new DefaultTreeModel(top);
     
     public Main() {
         initComponents();
@@ -34,11 +41,15 @@ public class Main extends javax.swing.JFrame {
         loger = new javax.swing.JTextPane();
         jPanel1 = new javax.swing.JPanel();
         tFile = new javax.swing.JTextField();
-        bStart = new javax.swing.JButton();
+        bLoad = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         tLogin = new javax.swing.JTextField();
         tPassword = new javax.swing.JPasswordField();
         bLogin = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tree = new javax.swing.JTree();
+        bTree = new javax.swing.JButton();
+        bStart = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -47,16 +58,11 @@ public class Main extends javax.swing.JFrame {
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Path to XLS file"));
 
         tFile.setText("C:\\Users\\Pawel\\Dropbox\\Wiki\\Wiki Lubi Zabytki\\Listy\\kujawsko-pomorskie.xls");
-        tFile.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tFileActionPerformed(evt);
-            }
-        });
 
-        bStart.setText("Start");
-        bStart.addActionListener(new java.awt.event.ActionListener() {
+        bLoad.setText("Load");
+        bLoad.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bStartActionPerformed(evt);
+                bLoadActionPerformed(evt);
             }
         });
 
@@ -66,20 +72,18 @@ public class Main extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(tFile, javax.swing.GroupLayout.DEFAULT_SIZE, 475, Short.MAX_VALUE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(bStart, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addComponent(tFile, javax.swing.GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(bLoad)
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(tFile, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(bStart)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(tFile, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(bLoad))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -88,6 +92,11 @@ public class Main extends javax.swing.JFrame {
         tLogin.setText("YarluBot");
 
         bLogin.setText("Log in");
+        bLogin.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bLoginActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -95,25 +104,40 @@ public class Main extends javax.swing.JFrame {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(tLogin)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(tPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(bLogin, javax.swing.GroupLayout.DEFAULT_SIZE, 90, Short.MAX_VALUE)))
+                .addComponent(tLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 8, Short.MAX_VALUE)
+                .addComponent(tPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(bLogin)
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(tLogin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(tPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(tLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(tPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(bLogin))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        tree.setModel(model);
+        jScrollPane1.setViewportView(tree);
+
+        bTree.setText("Load tree");
+        bTree.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bTreeActionPerformed(evt);
+            }
+        });
+
+        bStart.setText("<html><b>Upload to wiki</b></html>");
+        bStart.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bStartActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -122,22 +146,33 @@ public class Main extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jScrollPane2)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addContainerGap())
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(bStart, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane1)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(bTree, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(8, 8, 8))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(bTree)
+                    .addComponent(bStart, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(9, 9, 9)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2)
+                    .addComponent(jScrollPane1))
                 .addContainerGap())
         );
 
@@ -145,11 +180,24 @@ public class Main extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void bStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bStartActionPerformed
+        uploadWiki();
+    }//GEN-LAST:event_bStartActionPerformed
+
+    private void bLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bLoginActionPerformed
+        try {
+            wiki.login(tLogin.getText(), tPassword.getPassword());
+            log.green(wiki.getDomain() + ": logged in\n");
+        } catch (IOException | FailedLoginException ex) {
+            log.red(ex.getLocalizedMessage() + "\n");
+        }
+    }//GEN-LAST:event_bLoginActionPerformed
+
+    private void bLoadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bLoadActionPerformed
         Runnable run = new Runnable() {
             @Override
             public void run() {
                 try {
-                    start(tFile.getText());
+                    loadXLS(tFile.getText());
                 } catch (IOException | BiffException ex) {
                     Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -157,20 +205,21 @@ public class Main extends javax.swing.JFrame {
         };
         Thread t = new Thread(run);
         t.start();
-    }//GEN-LAST:event_bStartActionPerformed
+    }//GEN-LAST:event_bLoadActionPerformed
 
-    private void tFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tFileActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_tFileActionPerformed
+    private void bTreeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bTreeActionPerformed
+        loadTree();
+    }//GEN-LAST:event_bTreeActionPerformed
 
-    private void start(String path) throws IOException, BiffException {
+    private void loadXLS(String path) throws IOException, BiffException {
         //@source: http://stackoverflow.com/a/7451775
         WorkbookSettings workbookSettings = new WorkbookSettings();
         workbookSettings.setEncoding("Cp1250");
     
         Workbook workbook = Workbook.getWorkbook(new File(tFile.getText()), workbookSettings);
         Sheet sheet = workbook.getSheet(0);
- 
+        log.log("file opened, loading...\n");
+        
         int currentPowiat = 0;
         int currentGmina = 0;
         
@@ -196,7 +245,7 @@ public class Main extends javax.swing.JFrame {
         
         //if default stop
         
-        for(int i=1; i<100 /*sheet.getColumn(0).length*/; ++i) {
+        for(int i=1; i<sheet.getColumn(0).length; ++i) {
             String id = sheet.getCell(0,i).getContents();
             String powiat = sheet.getCell(2,i).getContents();
             String gmina = sheet.getCell(3,i).getContents();
@@ -204,7 +253,7 @@ public class Main extends javax.swing.JFrame {
             String name = sheet.getCell(5,i).getContents();
             String hint = sheet.getCell(6,i).getContents();
             String street = sheet.getCell(7,i).getContents();
-            int partOf = Integer.parseInt(sheet.getCell(9,i).getContents());
+            int partOf = (sheet.getCell(9,i).getContents().isEmpty()) ? 1 : Integer.parseInt(sheet.getCell(9,i).getContents());
             String material = sheet.getCell(10,i).getContents();
             String date = sheet.getCell(11,i).getContents();
             String number = sheet.getCell(12,i).getContents();
@@ -239,6 +288,7 @@ public class Main extends javax.swing.JFrame {
                     //System.out.println("Dodaję powiat '"+powiat+"'");
                     powiats.add(new Powiat(powiat));
                     currentPowiat = powiats.size()-1;
+                    currentGmina = 0;
                 }
             } //else System.out.println("Aktualny powiat pasuje!");
             
@@ -266,11 +316,18 @@ public class Main extends javax.swing.JFrame {
             Monument m = new Monument(id, name, number, gmina, town, street, partOf);
             powiats.get(currentPowiat).gminas.get(currentGmina).add(m);
         }
-        
-
-        for(Powiat p : powiats) log.log(p.show());
-        
+        log.log("done\n\n");
         workbook.close();
+    }
+    
+    public void loadTree() {
+        log.log("loading tree...\n");
+        for(Powiat p : powiats) p.createTree();
+        log.log("done\n\n");
+    }
+    
+    public void uploadWiki() {
+        //for(Powiat p : powiats) p.uploadWiki();
     }
     
     /**
@@ -300,14 +357,18 @@ public class Main extends javax.swing.JFrame {
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton bLoad;
     private javax.swing.JButton bLogin;
     private javax.swing.JButton bStart;
+    private javax.swing.JButton bTree;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextPane loger;
     private javax.swing.JTextField tFile;
     private javax.swing.JTextField tLogin;
     private javax.swing.JPasswordField tPassword;
+    public static javax.swing.JTree tree;
     // End of variables declaration//GEN-END:variables
 }
