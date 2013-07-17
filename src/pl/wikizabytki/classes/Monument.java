@@ -31,7 +31,7 @@ public class Monument {
         this.town = town;
     }
     
-    public Monument(String id, String name, String number, String gmina, String town, String street, int partOf) {
+    public Monument(String id, String name, String number, String gmina, String town, String street, int partOf, String hint, String year) {
         this.id = Integer.parseInt(id);
         this.name = name;
         this.number = number;
@@ -39,6 +39,8 @@ public class Monument {
         this.town = town;
         this.street = street;
         this.partOf = partOf;
+        this.hint = hint;
+        this.year = year;
     }
     
     /**
@@ -47,17 +49,27 @@ public class Monument {
      * @return 
      */
     public boolean isPart(Monument m) {
-        //if(name.contains("zespół")) return false;
-        //if(m.partOf == 1) return false;
+        //if "parent" is not complex
+        if(m.partOf == 1) return false;
         
-        if(m.number.equals(number)) {
-            //System.out.println("Equals: number");
+        //first monument after complex should be in this complex
+        if(m.parts.isEmpty()) return true;
+        
+        //match of register number
+        if(!number.isEmpty() && m.number.equals(number)) return true;
+        
+        //hint contains text "part of"
+        if(hint.contains("w zespole")) return true;
+        
+        //
+        if(!m.parts.isEmpty() 
+                && m.parts.get(0).name.contains("kościół")
+                && hint.contains("przy "))
             return true;
-        }
-        if(m.street.equals(street) && m.number.equals(number)) {
-            //System.out.println("Equals: street 'n' number");
-            return true;
-        }
+        
+        //match of streets
+        if(!street.isEmpty() && m.street.equals(street)) return true;
+
         return false;
     }
        
@@ -84,19 +96,23 @@ public class Monument {
         String text = "{{zabytki/wpis\n";
             text += "| numer       = " + number + " | id = " + id + "\n";
             text += "| zespół zabytków = "; 
-                if(parts.isEmpty()) text += "nie\n";
-                else if(!parts.isEmpty()) text += "tak\n";
-                else if(n>0) text += n + "\n";
+                if(n>0) text += n + "\n";
+                else if(partOf == 0) text += "tak\n";
+                else if(partOf == 1) text += "nie\n";
                 else text += "??";
-            text += "| nazwa       = " + name + "\n";
+            text += "| nazwa       = " + name;
+                if(!year.isEmpty()) text += ", " + year;
+                if(!hint.isEmpty() && n == -1) text += " <small>(" + hint + ")</small>";
+                if(partOf == 0 && parts.isEmpty()) text += " <font color=red>'''brak zabytków w zespole'''</font>";
+                text += "\n";
             text += "| miejscowość = " + town + "\n";
             text += "| adres       = " + street + "\n";
             text += "| długość     =  | szerokość  = \n";
             text += "| zdjęcie     = \n";
             text += "| commons     = \n";
             text += "}}\n";
-            
-        if(!parts.isEmpty()){
+        
+        if(partOf == 0){
             text += "{{zabytki/zespół zabytków/góra}}\n";
             for(Monument m : parts) text += m.getWikiCode(id);
             text += "{{zabytki/zespół zabytków/dół}}\n";

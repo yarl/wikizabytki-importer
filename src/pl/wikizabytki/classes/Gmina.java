@@ -32,7 +32,7 @@ public class Gmina {
     }
 
     public String getWikiCode() {
-        String text = "<includeonly>== " + name + "==\n{{edytuj|{{SUBST:FULLPAGENAME}}}}</includeonly>\n{{zabytki/góra\n";
+        String text = "<includeonly>== " + name + "==</includeonly>\n{{edytuj|{{SUBST:FULLPAGENAME}}}}\n{{zabytki/góra\n";
             text += "| województwo = " + Main.VOIV_CODE + "\n";
             text += "| powiat      = " + powiat + "\n";
             text += "| gmina       = " + name + "\n";

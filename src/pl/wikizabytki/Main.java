@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import javax.security.auth.login.FailedLoginException;
+import javax.security.auth.login.LoginException;
 import jxl.*; 
 import javax.swing.UIManager;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -57,7 +58,7 @@ public class Main extends javax.swing.JFrame {
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Path to XLS file"));
 
-        tFile.setText("C:\\Users\\Pawel\\Dropbox\\Wiki\\Wiki Lubi Zabytki\\Listy\\kujawsko-pomorskie.xls");
+        tFile.setText("C:\\Users\\Pawel\\Dropbox\\Wiki\\Wiki Lubi Zabytki\\Listy\\dolnoslaskie.xls");
 
         bLoad.setText("Load");
         bLoad.addActionListener(new java.awt.event.ActionListener() {
@@ -193,141 +194,155 @@ public class Main extends javax.swing.JFrame {
     }//GEN-LAST:event_bLoginActionPerformed
 
     private void bLoadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bLoadActionPerformed
-        Runnable run = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    loadXLS(tFile.getText());
-                } catch (IOException | BiffException ex) {
-                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        };
-        Thread t = new Thread(run);
-        t.start();
+        loadXLS(tFile.getText());
     }//GEN-LAST:event_bLoadActionPerformed
 
     private void bTreeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bTreeActionPerformed
         loadTree();
     }//GEN-LAST:event_bTreeActionPerformed
 
-    private void loadXLS(String path) throws IOException, BiffException {
-        //@source: http://stackoverflow.com/a/7451775
-        WorkbookSettings workbookSettings = new WorkbookSettings();
-        workbookSettings.setEncoding("Cp1250");
-    
-        Workbook workbook = Workbook.getWorkbook(new File(tFile.getText()), workbookSettings);
-        Sheet sheet = workbook.getSheet(0);
-        log.log("file opened, loading...\n");
-        
-        int currentPowiat = 0;
-        int currentGmina = 0;
-        
-        VOIV = sheet.getCell(1,1).getContents();
-        switch(VOIV){
-            case "kujawsko-pomorskie": VOIV_CODE = "PL-KP"; break;
-            case "lubelskie": VOIV_CODE = "PL-LU"; break;
-            case "lubuskie": VOIV_CODE = "PL-LB"; break;
-            case "łódzkie": VOIV_CODE = "PL-LD"; break;
-            case "małopolskie": VOIV_CODE = "PL-MA"; break;
-            case "mazowieckie": VOIV_CODE = "PL-MZ"; break;
-            case "opolskie": VOIV_CODE = "PL-OP"; break;
-            case "podkarpackie": VOIV_CODE = "PL-PK"; break;
-            case "podlaskie": VOIV_CODE = "PL-PD"; break;
-            case "pomorskie": VOIV_CODE = "PL-PM"; break;
-            case "śląskie": VOIV_CODE = "PL-SL"; break;
-            case "świętokrzyskie": VOIV_CODE = "PL-SK"; break;
-            case "warmińsko-mazurskie": VOIV_CODE = "PL-WN"; break;
-            case "wielkopolskie": VOIV_CODE = "PL-WP"; break;
-            case "zachodniopomorskie": VOIV_CODE = "PL-ZP"; break;
-            default: VOIV_CODE = "??";
-        }
-        
-        //if default stop
-        
-        for(int i=1; i<sheet.getColumn(0).length; ++i) {
-            String id = sheet.getCell(0,i).getContents();
-            String powiat = sheet.getCell(2,i).getContents();
-            String gmina = sheet.getCell(3,i).getContents();
-            String town = sheet.getCell(4,i).getContents();
-            String name = sheet.getCell(5,i).getContents();
-            String hint = sheet.getCell(6,i).getContents();
-            String street = sheet.getCell(7,i).getContents();
-            int partOf = (sheet.getCell(9,i).getContents().isEmpty()) ? 1 : Integer.parseInt(sheet.getCell(9,i).getContents());
-            String material = sheet.getCell(10,i).getContents();
-            String date = sheet.getCell(11,i).getContents();
-            String number = sheet.getCell(12,i).getContents();
-            
-            //fixes
-            if(gmina.endsWith(" - gm."))
-                gmina = gmina.substring(0, gmina.indexOf(" - gm."));
-            
-            if(gmina.startsWith("M. "))
-                gmina = gmina.substring(3);
-            else
-                gmina = "gmina " + gmina;
-            
-            if(powiat.startsWith("m. "))
-                powiat = powiat.substring(3);
-            else
-                powiat = "powiat " + powiat;
-            
-            //powiat
-            if(powiats.isEmpty())
-                powiats.add(new Powiat(powiat));
-            
-            if(!powiats.get(currentPowiat).name.equals(powiat)) {
-                boolean flag = false;
-                for(Powiat p : powiats)
-                    if(p.name.equals(powiat)) {
-                        //System.out.println("Znalazłem powiat '"+powiat+"'");
-                        currentPowiat = powiats.indexOf(p);
-                        flag = true; break; 
-                    };
-                if(!flag) {
-                    //System.out.println("Dodaję powiat '"+powiat+"'");
-                    powiats.add(new Powiat(powiat));
-                    currentPowiat = powiats.size()-1;
-                    currentGmina = 0;
-                }
-            } //else System.out.println("Aktualny powiat pasuje!");
-            
-            //gmina
-            if(powiats.get(currentPowiat).gminas.isEmpty()) 
-                powiats.get(currentPowiat).gminas.add(new Gmina(gmina, currentPowiat));
-            
-            if(!powiats.get(currentPowiat).gminas.get(currentGmina).name.equals(gmina)) {
-                boolean flag = false;
-                for(Gmina g : powiats.get(currentPowiat).gminas)
-                    if(g.name.equals(gmina)) {
-                        //System.out.println("Znalazłem gminę '"+gmina+"'");
-                        currentGmina = powiats.get(currentPowiat).gminas.indexOf(g);
-                        flag = true; break; 
-                    };
+    private void loadXLS(String path) {
+        Runnable run = new Runnable() {
+            @Override
+            public void run() {
+                //@source: http://stackoverflow.com/a/7451775
+                WorkbookSettings workbookSettings = new WorkbookSettings();
+                workbookSettings.setEncoding("Cp1250");
 
-                if(!flag) {
-                    //System.out.println("Dodaję gminę '"+gmina+"'");
-                    powiats.get(currentPowiat).gminas.add(new Gmina(gmina, currentPowiat));
-                    currentGmina = powiats.get(currentPowiat).gminas.size()-1;
+                Workbook workbook = null;
+                try {
+                    workbook = Workbook.getWorkbook(new File(tFile.getText()), workbookSettings);
+                } catch (IOException | BiffException ex) {
+                    log.red("Something wrong with file!\n");
                 }
-            } //else System.out.println("Aktualna gmina pasuje!");
-            
-            //zabytek
-            Monument m = new Monument(id, name, number, gmina, town, street, partOf);
-            powiats.get(currentPowiat).gminas.get(currentGmina).add(m);
-        }
-        log.log("done\n\n");
-        workbook.close();
+                Sheet sheet = workbook.getSheet(0);
+                log.log("\nFile: loading content...\n");
+
+                int currentPowiat = 0;
+                int currentGmina = 0;
+
+                VOIV = sheet.getCell(1,1).getContents();
+                switch(VOIV){
+                    case "dolnośląskie": VOIV_CODE = "PL-DS"; break;
+                    case "kujawsko-pomorskie": VOIV_CODE = "PL-KP"; break;
+                    case "lubelskie": VOIV_CODE = "PL-LU"; break;
+                    case "lubuskie": VOIV_CODE = "PL-LB"; break;
+                    case "łódzkie": VOIV_CODE = "PL-LD"; break;
+                    case "małopolskie": VOIV_CODE = "PL-MA"; break;
+                    case "mazowieckie": VOIV_CODE = "PL-MZ"; break;
+                    case "opolskie": VOIV_CODE = "PL-OP"; break;
+                    case "podkarpackie": VOIV_CODE = "PL-PK"; break;
+                    case "podlaskie": VOIV_CODE = "PL-PD"; break;
+                    case "pomorskie": VOIV_CODE = "PL-PM"; break;
+                    case "śląskie": VOIV_CODE = "PL-SL"; break;
+                    case "świętokrzyskie": VOIV_CODE = "PL-SK"; break;
+                    case "warmińsko-mazurskie": VOIV_CODE = "PL-WN"; break;
+                    case "wielkopolskie": VOIV_CODE = "PL-WP"; break;
+                    case "zachodniopomorskie": VOIV_CODE = "PL-ZP"; break;
+                    default: VOIV_CODE = "??";
+                }
+
+                //if default stop
+
+                for(int i=1; i<sheet.getColumn(0).length; ++i) {
+                    String id = sheet.getCell(0,i).getContents();
+                    String powiat = sheet.getCell(2,i).getContents();
+                    String gmina = sheet.getCell(3,i).getContents();
+                    String town = sheet.getCell(4,i).getContents();
+                    String name = sheet.getCell(5,i).getContents();
+                    String hint = sheet.getCell(6,i).getContents();
+                    String street = sheet.getCell(7,i).getContents();
+                    int partOf = (sheet.getCell(9,i).getContents().isEmpty()) ? 1 : Integer.parseInt(sheet.getCell(9,i).getContents());
+                    String material = sheet.getCell(10,i).getContents();
+                    String date = sheet.getCell(11,i).getContents();
+                    String number = sheet.getCell(12,i).getContents();
+
+                    //fixes
+                    if(gmina.endsWith(" - gm."))
+                        gmina = gmina.substring(0, gmina.indexOf(" - gm."));
+
+                    if(gmina.endsWith(" - m."))
+                        gmina = gmina.substring(0, gmina.indexOf(" - m."));
+
+                    if(gmina.startsWith("M. "))
+                        gmina = gmina.substring(3);
+                    else if(!powiat.startsWith("m. "))
+                        gmina = "gmina " + gmina;
+
+                    if(powiat.startsWith("m. "))
+                        powiat = powiat.substring(3);
+                    else
+                        powiat = "powiat " + powiat;
+
+                    //powiat
+                    if(powiats.isEmpty())
+                        powiats.add(new Powiat(powiat));
+
+                    if(!powiats.get(currentPowiat).name.equals(powiat)) {
+                        boolean flag = false;
+                        for(Powiat p : powiats)
+                            if(p.name.equals(powiat)) {
+                                //System.out.println("Znalazłem powiat '"+powiat+"'");
+                                currentPowiat = powiats.indexOf(p);
+                                flag = true; break; 
+                            };
+                        if(!flag) {
+                            //System.out.println("Dodaję powiat '"+powiat+"'");
+                            powiats.add(new Powiat(powiat));
+                            currentPowiat = powiats.size()-1;
+                            currentGmina = 0;
+                        }
+                    } //else System.out.println("Aktualny powiat pasuje!");
+
+                    //gmina
+                    if(powiats.get(currentPowiat).gminas.isEmpty()) 
+                        powiats.get(currentPowiat).gminas.add(new Gmina(gmina, currentPowiat));
+
+                    if(!powiats.get(currentPowiat).gminas.get(currentGmina).name.equals(gmina)) {
+                        boolean flag = false;
+                        for(Gmina g : powiats.get(currentPowiat).gminas)
+                            if(g.name.equals(gmina)) {
+                                //System.out.println("Znalazłem gminę '"+gmina+"'");
+                                currentGmina = powiats.get(currentPowiat).gminas.indexOf(g);
+                                flag = true; break; 
+                            };
+
+                        if(!flag) {
+                            //System.out.println("Dodaję gminę '"+gmina+"'");
+                            powiats.get(currentPowiat).gminas.add(new Gmina(gmina, currentPowiat));
+                            currentGmina = powiats.get(currentPowiat).gminas.size()-1;
+                        }
+                    } //else System.out.println("Aktualna gmina pasuje!");
+
+                    //zabytek
+                    Monument m = new Monument(id, name, number, gmina, town, street, partOf, hint, date);
+                    powiats.get(currentPowiat).gminas.get(currentGmina).add(m);
+                }
+                log.log("File: loading done\n\n");
+                workbook.close();
+            }
+        };
+        Thread t = new Thread(run);
+        t.start();
     }
     
     public void loadTree() {
-        log.log("loading tree...\n");
+        log.log("\nTree: loading...\n");
         for(Powiat p : powiats) p.createTree();
-        log.log("done\n\n");
+        log.log("Tree: loading done\n\n");
     }
     
     public void uploadWiki() {
-        //for(Powiat p : powiats) p.uploadWiki();
+        String text = "";
+        for(Powiat p : powiats) text += "* [[/" + p.name + "]]\n";
+        
+        try {
+            Main.wiki.edit("Wikipedia:Wiki Lubi Zabytki/" + Main.VOIV, text, "import zabytków");
+            Main.log.green(Main.VOIV + ": uploaded!\n");
+            for(Powiat p : powiats) p.uploadWiki();
+        } catch (IOException | LoginException ex) {
+            Main.log.red(ex.getLocalizedMessage() + "\n");
+        }
     }
     
     /**

@@ -115,7 +115,7 @@
       <SubComponents>
         <Component class="javax.swing.JTextField" name="tFile">
           <Properties>
-            <Property name="text" type="java.lang.String" value="C:\u005cUsers\u005cPawel\u005cDropbox\u005cWiki\u005cWiki Lubi Zabytki\u005cListy\u005ckujawsko-pomorskie.xls" containsInvalidXMLChars="true"/>
+            <Property name="text" type="java.lang.String" value="C:\u005cUsers\u005cPawel\u005cDropbox\u005cWiki\u005cWiki Lubi Zabytki\u005cListy\u005cdolnoslaskie.xls" containsInvalidXMLChars="true"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JButton" name="bLoad">
